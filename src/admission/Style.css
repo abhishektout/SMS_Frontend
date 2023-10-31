@@ -1,0 +1,11 @@
+.heading {
+    text-align: center;
+    font-weight: bold;
+}
+input::placeholder {
+font-size: 14px; /* Adjust the font size as needed */
+font-weight: bold;
+}
+label{
+font-weight: 700;
+}
