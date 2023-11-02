@@ -14,14 +14,15 @@ export function Admin(){
     const submitForm =async (event) =>{
             event.preventDefault();
             try{
-                let response = await axios.post(api.URL_S+api.ADMIN_SIGNIN,{email,password})
+                let response = await axios.post(api.URL_S+api.ADMIN_SIGNIN,{schoolId:email,password})
+                console.log(response)
                 if(response.data.status){
                     toast.success("Sign In successfully.....");
                     navigate("/home")
                 }
             }
             catch(err){
-                toast.error("Something went wrong....");
+                toast.error("inner catch block");
             }
     }
        return<>

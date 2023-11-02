@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useState } from "react"
 import Navbaar from "../Navbar/navbar";
+import api from "../WebApi/api";
 
 export default function FeesCOllection() {
     const [studentId, setStudentId] = useState("");
@@ -39,7 +40,7 @@ export default function FeesCOllection() {
     }
     const verifyFromAccount = async () => {
         try {
-            const response = await axios.post("http://localhost:3000/accountInfo/verifyTransactionId", { transactionId: transactionId })
+            const response = await axios.post(api.URL_S+"/accountInfo/verifyTransactionId", { transactionId: transactionId })
             setAccountFeeData(response.data.fee)
             return true;
         } catch (err) {
@@ -52,7 +53,7 @@ export default function FeesCOllection() {
         if (verify)
             if (validateStudentId() && validateFeeAmount() && validateTransactionHistory()) {
                 try {
-                    const response = await axios.post("http://localhost:3000/student/fees", { stdId: studentId, fee: feeAmount, transactionId: transactionId, paymentMode: "online" })
+                    const response = await axios.post(api.URL_S+"/student/fees", { stdId: studentId, fee: feeAmount, transactionId: transactionId, paymentMode: "online" })
                     alert("all done")
                 } catch (err) {
                     alert("error")
