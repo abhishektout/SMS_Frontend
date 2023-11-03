@@ -1,67 +1,44 @@
 import axios from "axios";
 import { useState } from "react"
 import Navbaar from "../Navbar/navbar";
+import api from "../WebApi/api";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function FeesCOllection() {
     const [studentId, setStudentId] = useState("");
     const [feeAmount, setFeeAmount] = useState(0);
     const [transactionId, setTransactionId] = useState("");
-    const [collageAccount, setcollageAccount] = useState(false)
-    const [accuntFeeData, setAccountFeeData] = useState(0);
-
-    const validateStudentId = () => {
-        const pattern = /^[A-Z]{2,4}\d{6}$/;
-        const isValid = pattern.test(studentId);
-        return isValid;
-    }
-    const validateFeeAmount = () => {
-        if (!feeAmount) {
-            alert("please enter fee amount")
-            return false;
-        }
-        else if (feeAmount != accuntFeeData) {
-            alert("invalid ammount")
-            return false;
-        }
-        else if (feeAmount < 0) {
-            alert("invalid ammount")
-            return false;
-        }
-        else {
-            const feeAmountPattern = /^\d+(\.\d{1,2})?$/;
-            return feeAmount.match(feeAmountPattern) ? true : false;
-        }
-    }
-    const validateTransactionHistory = () => {
-        if (transactionId)
-            return true;
-        return false;
-    }
+    const [transactionVerifyFlag, setTransactionVerifyFlag] = useState(false)
     const verifyFromAccount = async () => {
         try {
-            const response = await axios.post("http://localhost:3000/accountInfo/verifyTransactionId", { transactionId: transactionId })
-            setAccountFeeData(response.data.fee)
+            let response = await axios.post(api.URL_S + api.VERIFY_TRANSACTION_ID, { transactionId: transactionId });
+            setFeeAmount(response.data.result);
+            setTransactionVerifyFlag(true);
             return true;
         } catch (err) {
-            alert("error")
-            return true;
+            setTransactionVerifyFlag(false);
         }
     }
     const submitButton = async () => {
-        const verify = verifyFromAccount();
-        if (verify)
-            if (validateStudentId() && validateFeeAmount() && validateTransactionHistory()) {
-                try {
-                    const response = await axios.post("http://localhost:3000/student/fees", { stdId: studentId, fee: feeAmount, transactionId: transactionId, paymentMode: "online" })
-                    alert("all done")
-                } catch (err) {
-                    alert("error")
-                }
+        if (transactionVerifyFlag)
+            try {
+                const response = await axios.post(api.URL_S + api.STUDENT_FEE, { stdId: studentId, fee: feeAmount, transactionId: transactionId, paymentMode: "online" })
+                toast.success("Successfully Fee Collect..");
+
+            } catch (err) {
+                console.log(err)
+                if (err.response.status == 400) 
+                  toast.error("Transaction id used....");
+                
+                else if (err.response.status == 410)
+                    toast.error("Transaction id not valid....");
+                else
+                    toast.error("internal server error....");
             }
-            else
-                alert("something wrong")
     }
     return <>
+        <ToastContainer />
         <Navbaar />
         <div>
             <div>
@@ -74,7 +51,7 @@ export default function FeesCOllection() {
                     <label>Student Id</label>
                 </div>
                 <div className="col-md-6">
-                    <input onBlur={(event) => setStudentId(event.target.value)} type="text" placeholder="enter student id" />
+                    <input onChange={(event) => setStudentId(event.target.value)} type="text" placeholder="enter student id" />
                 </div>
             </div>
             <div className="row m-2">
@@ -82,7 +59,7 @@ export default function FeesCOllection() {
                     <label>Transaction Id</label>
                 </div>
                 <div className="col-md-6">
-                    <input onBlur={(event) => setTransactionId(event.target.value)} type="text" placeholder="enter Transaction Id" />
+                    <input onBlur={() => verifyFromAccount()} onChange={(event) => setTransactionId(event.target.value)} type="text" placeholder="enter Transaction Id" />
                 </div>
             </div>
             <div className="row m-2">
@@ -90,7 +67,7 @@ export default function FeesCOllection() {
                     <label>Fee Amount</label>
                 </div>
                 <div className="col-md-6">
-                    <input onBlur={(event) => setFeeAmount(event.target.value)} type="text" placeholder="enter fee amount" />
+                    <input readOnly value={feeAmount} onChange={(event) => setFeeAmount(event.target.value)}  placeholder="enter fee amount" />
                 </div>
             </div>
             <div className="text-center mt-4">
