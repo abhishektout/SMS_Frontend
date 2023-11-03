@@ -15,6 +15,9 @@ function AdmissionProcess() {
     const [stdAddress, setStdAddress] = useState("");
     const [stdFee, setStdFee] = useState();
     const [dob, setDob] = useState("");
+    const [stdContact, setstdContact] = useState("");
+    const [stdEmail, setStdEmail] = useState("");
+
     const [aadharNumber, setAadharNumber] = useState();
     const [castNumber, setCastNumber] = useState("");
     const [birthCertificate, setBirthCertificate] = useState("");
@@ -30,7 +33,7 @@ function AdmissionProcess() {
             if (verifyTransactionIdFlag) {
                 await generateStudentId();
                 if (stdId) {
-                    let response = await axios.post(api.URL_S + api.STUDENT_REGISTRATION, { stdId, aadharNumber, castNumber, stdAddress, stdClass, stdFee, stdFname, stdGender, stdId, stdMothername, stdName, dob, birthCertificate, incomeProof, previousClass, previousClassRollNumber, transactionId, fee: RegistrationAmount });
+                    let response = await axios.post(api.URL_S + api.STUDENT_REGISTRATION, {stdContact,stdEmail, stdId, aadharNumber, castNumber, stdAddress, stdClass, stdFee, stdFname, stdGender, stdId, stdMothername, stdName, dob, birthCertificate, incomeProof, previousClass, previousClassRollNumber, transactionId, fee: RegistrationAmount });
                     toast.success("Registration Successfuly.......");
                 }
             } else
@@ -137,6 +140,31 @@ function AdmissionProcess() {
                             </div>
                             <div className="col-6">
                                 <input type='text' onChange={(event) => { setStdGender(event.target.value) }} />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div className="p-5" style={{ marginTop: "-8vw" }}>
+                <div className="row">
+                    <div className="col-6">
+                        <div className="row">
+                            <div className="col-6">
+                                <label>Student Contact</label>
+                            </div>
+                            <div className="col-6">
+                                <input type='text' onChange={(event) => { setstdContact(event.target.value) }} />
+
+                            </div>
+                        </div>
+                    </div>
+                    <div className="col-6">
+                        <div className="row">
+                            <div className="col-6">
+                                <label>Student Email Address</label>
+                            </div>
+                            <div className="col-6">
+                                <input type='text' onChange={(event) => { setStdEmail(event.target.value) }} />
                             </div>
                         </div>
                     </div>
