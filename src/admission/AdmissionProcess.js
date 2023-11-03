@@ -15,45 +15,71 @@ function AdmissionProcess() {
     const [dob, setDob] = useState("");
     const [aadharNumber, setAadharNumber] = useState();
     const [castNumber, setCastNumber] = useState("");
-    const [stdId, setStdId] = useState("");
+    // const [stdId, setStdId] = useState("");
     const [birthCertificate, setBirthCertificate] = useState("");
     const [incomeProof, setIncomeProof] = useState("");
     const [previousClass, setPreviousClass] = useState("");
     const [transactionId, setTransactionId] = useState("");
     const [previousClassRollNumber, setPreviousClassRollNumber] = useState("");
     const [RegistrationAmount, setRegistrationAmount] = useState()
+    let stdId;
+    // const handleSubmit = async (event) => {
+    //     try {
+    //         event.preventDefault();
+    //         if (RegistrationAmount >= 1500) {
+    //             let studentId =await generateStudentId();
+    //            await setStdId(studentId);
+    //             console.log(stdId)
+    //             if(verifyTransactionId){
+    //                 alert("inner if")
+    //                 let response = await axios.post(api.URL_S+api.STUDENT_REGISTRATION, { stdId, aadharNumber, castNumber, stdAddress, stdClass, stdFee, stdFname, stdGender, stdId, stdMothername, stdName, dob, birthCertificate, incomeProof, previousClass, previousClassRollNumber })
+    //                 console.log(response)
+    //                 alert("success");
+    //             }
+    //             else{
+    //                 alert("your transaction is invalid");
+    //             }
+    //         }
+    //         else {
+    //             alert("please pay 1500 rupees registration amount")
+    //         }
+    //     }
+    //     catch (err) {
+    //         console.log(err);
+    //         if (err.response.status == 400)
+    //             alert("already register")
+    //         else if (err.response.status == 500)
+    //             alert("please check information")
+    //     }
+
+    // }
     const handleSubmit = async (event) => {
         try {
             event.preventDefault();
-            if (RegistrationAmount >= 1500) {
-                let studentId = generateStudentId();
-                setStdId(studentId);
-                console.log(stdId)
-                if(verifyTransactionId){
-                    let response = await axios.post(api.URL_S+api.STUDENT_REGISTRATION, { stdId, aadharNumber, castNumber, stdAddress, stdClass, stdFee, stdFname, stdGender, stdId, stdMothername, stdName, dob, birthCertificate, incomeProof, previousClass, previousClassRollNumber })
-                    console.log(response)
+            if (verifyTransactionIdFlag) {
+                await generateStudentId();
+                // await setStdId(studentId);
+                console.log(stdId);
+                if(stdId){
+                    let response = await axios.post(api.URL_S + api.STUDENT_REGISTRATION, { stdId, aadharNumber, castNumber, stdAddress, stdClass, stdFee, stdFname, stdGender, stdId, stdMothername, stdName, dob, birthCertificate, incomeProof, previousClass, previousClassRollNumber , transactionId,fee:RegistrationAmount});
+                    console.log(response);
                     alert("success");
                 }
-                else{
-                    alert("your transaction is invalid");
-                }
+            } else {
+                alert("transaction id already use");
             }
-            else {
-                alert("please pay 1500 rupees registration amount")
-            }
-        }
-        catch (err) {
+        } catch (err) {
             console.log(err);
-            if (err.response.status == 400)
-                alert("already register")
-            else if (err.response.status == 500)
-                alert("please check information")
+            if (err.response && err.response.status === 400) {
+                alert("already registered");
+            } else if (err.response && err.response.status === 500) {
+                alert("please check information");
+            }
         }
-
-    }
+    };
+    
     const generateStudentId = () => {
         try {
-            alert("inner if")
             let namePrefix = stdName.substring(0, 2).toUpperCase();
             let randomDigits = Math.floor(1000 + Math.random() * 9000);
             let studentClass;
@@ -69,7 +95,7 @@ function AdmissionProcess() {
                 studentClass = '05';
             }
             let studentId = namePrefix + randomDigits + studentClass;
-            return studentId;
+            stdId=studentId;
         } catch (error) {
             console.error("An error occurred: " + error);
         }
@@ -85,21 +111,24 @@ function AdmissionProcess() {
         }
     }
     const verifyTransactionId = async () => {
+        alert("verigy")
         try {
-            const response = await axios.post(api.URL_S+api.VERIFY_TRANSACTION_ID, { transactionId: transactionId });
-            console.log(response);
-            console.log(response.data.result);
+            let  response = await axios.post(api.URL_S+api.VERIFY_TRANSACTION_ID, { transactionId: transactionId });
             setRegistrationAmount(response.data.result);
             if (response) {
-                setRegistrationAmount(response.data.result);
-                const response = await axios.post(api.URL_S+api.CHECKALREADYTRANSACTIONID, { transactionId: transactionId });
-                if(response)
-                    setVerifyTransactionIdFlag(true);
+                console.log("after success response");
+                let response1 = await axios.post(api.URL_S+api.CHECKALREADYTRANSACTIONID, { transactionId: transactionId });
+                setVerifyTransactionIdFlag(true);
+                console.log(verifyTransactionIdFlag)
+                console.log(response1)           
             }
-        } catch (err) {
+        }
+         catch (err) {
+            setVerifyTransactionIdFlag(false);
             console.log(err);
         }
     }
+    console.log(verifyTransactionIdFlag)
     return <>
         <Navbaar/>
         <form onSubmit={handleSubmit}>

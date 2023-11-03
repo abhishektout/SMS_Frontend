@@ -14,7 +14,8 @@ export function Admin(){
     const submitForm =async (event) =>{
             event.preventDefault();
             try{
-                let response = await axios.post(api.URL_S+api.ADMIN_SIGNIN,{email,password})
+                let schoolId=email;
+                let response = await axios.post(api.URL_S+api.ADMIN_SIGNIN,{schoolId,password})
                 if(response.data.status){
                     toast.success("Sign In successfully.....");
                     navigate("/home")
