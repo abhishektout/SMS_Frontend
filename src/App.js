@@ -5,14 +5,10 @@ import { Route, Router, Routes } from 'react-router-dom';
 import Home from './Home/home';
 import { Attendance } from './attendance/attendance';
 import { Admin } from './admin/admin';
-
-
 function App() {
   return <>
-      {/* <Admin/> */}
       <Routes>
       <Route path='/' element={<Admin/>}/>
-
       <Route path='/home' element={<Home/>}/>
       <Route path='/addmission' element={<AdmissionProcess/>}/>
       <Route path='/fees' element={<FeesCOllection/>}/>
